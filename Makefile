@@ -1,10 +1,11 @@
 CC=x86_64-w64-mingw32-gcc.exe
 CFLAGS=-g
 LDLIBS=-lSDL2 -lSDL2_image
-OBJECTS=hello.o
 
-hello: $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) $(LDLIBS) -o hello.exe
+all: hello perpixel gravity rotation subpixel
+
+hello: hello.o
+	$(CC) $(CFLAGS) hello.o $(LDLIBS) -o hello.exe
 
 hello.o:
 
