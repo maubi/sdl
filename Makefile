@@ -17,3 +17,13 @@ gravity: gravity.o
 	$(CC) $(CFLAGS) gravity.o $(LDLIBS) -o gravity.exe
 
 gravity.o:
+
+rotation: rotation.o
+	$(CC) $(CFLAGS) rotation.o $(LDLIBS) -o rotation.exe
+
+rotation.o:
+
+subpixel: subpixel.o
+	$(CC) $(CFLAGS) subpixel.o $(LDLIBS) -o subpixel.exe
+
+subpixel.o:
