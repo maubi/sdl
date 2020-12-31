@@ -28,3 +28,8 @@ subpixel: subpixel.o
 	$(CC) $(CFLAGS) subpixel.o $(LDLIBS) -o subpixel.exe
 
 subpixel.o:
+
+random: random.o
+	$(CC) $(CFLAGS) random.o $(LDLIBS) -o random.exe
+
+random.o:
