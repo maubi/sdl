@@ -45,6 +45,7 @@ int WinMain(int argc, char **argv) {
 	int c;
 	srand((unsigned) time(&t));
 	SDL_Rect rect;
+	SDL_Event event;
 
 	// sketch 1
 	int x, y, w, h;
@@ -52,6 +53,9 @@ int WinMain(int argc, char **argv) {
 	SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 	SDL_RenderClear(rend);
 	while(c < 30) {
+		while(SDL_PollEvent(&event)) {	// need to poll for events otherwise win becomes unresponsive
+		}
+
 		// draw random rect
 		w = (rand() % 40) + 10;
 		h = (rand() % 40) + 10;
@@ -80,6 +84,9 @@ int WinMain(int argc, char **argv) {
 	rect.y = (WINDOW_HEIGHT - 50) / 2;
 	rect.w = rect.h = 50;
 	while(c < 30) {
+		while(SDL_PollEvent(&event)) {		// need to poll the event queue otherwise win becomes unresponsive
+		}
+
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 		SDL_RenderClear(rend);
 		
