@@ -2,7 +2,7 @@ CC=x86_64-w64-mingw32-gcc.exe
 CFLAGS=-g -std=c99
 LDLIBS=-lSDL2 -lSDL2_image -lSDL2_ttf
 
-all: hello perpixel gravity rotation subpixel
+all: hello perpixel gravity rotation subpixel random genetic risk text
 
 hello: hello.o
 	$(CC) $(CFLAGS) hello.o $(LDLIBS) -o hello.exe
