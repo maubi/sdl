@@ -1,5 +1,5 @@
 CC=x86_64-w64-mingw32-gcc.exe
-CFLAGS=-g
+CFLAGS=-g -std=c99
 LDLIBS=-lSDL2 -lSDL2_image
 
 all: hello perpixel gravity rotation subpixel
@@ -33,3 +33,13 @@ random: random.o
 	$(CC) $(CFLAGS) random.o $(LDLIBS) -o random.exe
 
 random.o:
+
+genetic: genetic.o
+	$(CC) $(CFLAGS) genetic.o $(LDLIBS) -o genetic.exe
+
+genetic.o:
+
+risk: risk.o
+	$(CC) $(CFLAGS) risk.o $(LDLIBS) -o risk.exe
+
+risk.o:
