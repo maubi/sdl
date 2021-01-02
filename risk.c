@@ -11,7 +11,7 @@
 #define RISKS 100
 #define CYCLES 1000
 #define CYCLE_WAIT 50
-#define INITIAL_MONEY 500
+#define INITIAL_MONEY 0
 
 typedef struct player {
 	int money;
