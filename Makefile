@@ -1,6 +1,6 @@
 CC=x86_64-w64-mingw32-gcc.exe
 CFLAGS=-g -std=c99
-LDLIBS=-lSDL2 -lSDL2_image
+LDLIBS=-lSDL2 -lSDL2_image -lSDL2_ttf
 
 all: hello perpixel gravity rotation subpixel
 
@@ -43,3 +43,8 @@ risk: risk.o
 	$(CC) $(CFLAGS) risk.o $(LDLIBS) -o risk.exe
 
 risk.o:
+
+text: text.o
+	$(CC) $(CFLAGS) text.o $(LDLIBS) -o text.exe
+
+text.o:
