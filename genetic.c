@@ -8,19 +8,20 @@
 #define WINDOW_WIDTH (800)
 #define WINDOW_HEIGHT (600)
 
-#define POPULATION 360
-#define DNA_SIZE 10
-#define CYCLE_WAIT 100
-#define CYCLES 10000
+#define POPULATION 2000
+#define DNA_SIZE 6 
+#define CYCLE_WAIT 700
+#define CYCLES 100000
 #define ALPHA_OPAQUE 255
 #define ALPHA_TRANSPARENT 0
-#define CELL_W 10
-#define CELL_H 10
-#define PADDING 10
-#define COLS 6
-#define MARGIN_LEFT 75 
+#define CELL_W 5
+#define CELL_H 5
+#define PADDING 5
+#define COLS 20
+#define MARGIN_LEFT 0 
 #define TARGET_SIZE DNA_SIZE
-#define MUTATION_RATE 300
+#define MUTATION_RATE 100
+#define MAX_POOL_SIZE 100000
 
 typedef struct rgb {
 	int r;
@@ -40,19 +41,10 @@ void create_children(creature_t population[], int pool[], size_t s, creature_t c
 void mate(creature_t p1, creature_t p2, creature_t *child);
 void swap_population(creature_t p1[], creature_t p2[]);
 void mutate(creature_t *c);
+int check_solution(creature_t p[]);
+void log_solution(creature_t c);
 
-rgb_t target[TARGET_SIZE] = {
-	{255, 232, 210}
-	,{124, 40, 29}
-	,{0, 60, 90}
-	,{230, 230, 228}
-	,{35, 7, 50}
-	,{160, 130, 20}
-	,{10, 20, 30}
-	,{80, 243, 100}
-	,{112, 242, 20}
-	,{1, 2, 243}
-};
+rgb_t target[TARGET_SIZE];
 
 int WinMain(int argc, char **argv) {
 	if((SDL_Init(SDL_INIT_VIDEO)) != 0){
@@ -89,24 +81,30 @@ int WinMain(int argc, char **argv) {
 	SDL_Event event;
 
 	// init
+	SDL_Log("Generating target...");
+	for(int i = 0; i < TARGET_SIZE; i++) {
+		int n = rand() % 256;
+		target[i].r = n;
+		target[i].g = n;
+		target[i].b = n;
+	}
+
 	SDL_Log("Generating initial population: start (Population size is: %d)", POPULATION);
 	creature_t population[POPULATION];
 	for(int i = 0; i < POPULATION; i++) {
 		for(int j = 0; j < DNA_SIZE; j++) {
-			int r, g, b;
-			r = rand() % 256;
-			g = rand() % 256;
-			b = rand() % 256;
-			population[i].dna[j].r = r;
-			population[i].dna[j].g = g;
-			population[i].dna[j].b = b;
+			int n;
+			n = rand() % 256;
+			population[i].dna[j].r = n;
+			population[i].dna[j].g = n;
+			population[i].dna[j].b = n;
 		}
 	}
 	SDL_Log("Generating initial population: end");
 
 	// game loop
 	c = 0;
-	SDL_SetRenderDrawColor(rend, 0, 0, 0, ALPHA_OPAQUE);
+	SDL_SetRenderDrawColor(rend, 240, 130, 175, ALPHA_OPAQUE);
 	SDL_RenderClear(rend);
 	SDL_Log("Main loop: start");
 	while(c < CYCLES) {
@@ -115,7 +113,6 @@ int WinMain(int argc, char **argv) {
 		while(SDL_PollEvent(&event)) {	// need to poll for events otherwise win becomes unresponsive
 		}
 
-		//SDL_Log("Drawing creatures: start");
 		for(int i = 0; i < POPULATION; i++) {
 			int r = i / COLS;											// row
 			int c = i - r * COLS;										// column
@@ -131,24 +128,28 @@ int WinMain(int argc, char **argv) {
 				SDL_SetRenderDrawColor(rend, gene.r, gene.g, gene.b, ALPHA_OPAQUE);
 				SDL_RenderFillRect(rend, &rect);
 				x += CELL_W;
-				//SDL_Log("i: %d r: %d g: %d b: %d", i, gene.r, gene.g, gene.b);
 			}
 		}
 		SDL_RenderPresent(rend);
-		//SDL_Log("Drawing creatures: done");
 
-		// TODO: solution found: quit loop
+		calc_fitness(population);
 
-			calc_fitness(population);
+		int solved = check_solution(population);
+		if(solved >= 0) {
+			SDL_Log("SOLVED AT INDEX: %d", solved);
+			log_solution(population[solved]);
+			break;
+		}
 
-			int pool[10000];
-			size_t s = calc_mating_pool(population, pool);
-			log_mating_pool(pool, s);
 
-			creature_t children[POPULATION];
-			create_children(population, pool, s, children);
+		int pool[MAX_POOL_SIZE];
+		size_t s = calc_mating_pool(population, pool);
+		//log_mating_pool(pool, s);
 
-			swap_population(population, children);
+		creature_t children[POPULATION];
+		create_children(population, pool, s, children);
+
+		swap_population(population, children);
 
 		c++;
 		SDL_Delay(CYCLE_WAIT);
@@ -172,11 +173,9 @@ void calc_fitness(creature_t population[]) {
 				population[i].dna[j].g == target[j].g &&
 				population[i].dna[j].b == target[j].b) {
 				fitness++;
-				SDL_Log("MATCH!");
 			}
 		}
 		population[i].fitness = fitness;
-		//SDL_Log("i:%d f: %d", i, fitness);
 	}
 }
 
@@ -188,13 +187,12 @@ size_t calc_mating_pool(creature_t population[], int pool[]) {
 			k++;
 		}
 	}
-	SDL_Log("k: %d", k);
 	return k;
 }
 
 void log_mating_pool(int pool[], size_t size) {
 	for(int i = 0; i < size; i++) {
-		//SDL_Log("idx: %d val: %d", i, pool[i]);
+		SDL_Log("idx: %d val: %d", i, pool[i]);
 	}
 }
 
@@ -210,9 +208,6 @@ void create_children(creature_t population[], int pool[], size_t s, creature_t c
 }
 
 void mate(creature_t p1, creature_t p2, creature_t *child) {
-	//rgb_t dna_1[] = p1.dna;
-	//rgb_t dna_2[] = p2.dna;
-
 	for(int i = 0; i < DNA_SIZE; i++) {
 		int p = rand() % 2;
 		if(p == 0) {
@@ -220,7 +215,6 @@ void mate(creature_t p1, creature_t p2, creature_t *child) {
 		} else if(p == 1) {
 			child->dna[i] = p2.dna[i];
 		} else {
-			SDL_Log(">>>> ERROR!");
 		}
 	}
 }
@@ -233,14 +227,36 @@ void swap_population(creature_t p1[], creature_t p2[]) {
 
 void mutate(creature_t *c) {
 	for(int i = 0; i < DNA_SIZE; i++) {
-		int m = rand() % 1001;
+		int m = rand() % 1001;		// FIXME: remove magic number
 		if(m < MUTATION_RATE) {
-			c->dna[i].r = rand() % 256;
-			c->dna[i].g = rand() % 256;
-			c->dna[i].b = rand() % 256;
+			int n = rand() % 256;
+			c->dna[i].r = n;
+			c->dna[i].g = n;
+			c->dna[i].b = n;
 		}
 	}
 }
+
+int check_solution(creature_t p[]) {
+	for(int i = 0; i < POPULATION; i++) {
+		if(p[i].fitness == (1 + DNA_SIZE)) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+void log_solution(creature_t c) {
+	SDL_Log("Target is:");
+	for(int i = 0; i < TARGET_SIZE; i++) {
+		SDL_Log("{%d,%d,%d}", target[i].r, target[i].g, target[i].b);
+	}
+	SDL_Log("Solution is:");
+	for(int i = 0; i < DNA_SIZE; i++) {
+		SDL_Log("{%d,%d,%d}", c.dna[i].r, c.dna[i].g, c.dna[i].b);
+	}
+}
+
 
 
 
