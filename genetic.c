@@ -20,6 +20,7 @@
 #define COLS 6
 #define MARGIN_LEFT 75 
 #define TARGET_SIZE DNA_SIZE
+#define MUTATION_RATE 300
 
 typedef struct rgb {
 	int r;
@@ -38,6 +39,7 @@ void log_mating_pool(int pool[], size_t size);
 void create_children(creature_t population[], int pool[], size_t s, creature_t children[]);
 void mate(creature_t p1, creature_t p2, creature_t *child);
 void swap_population(creature_t p1[], creature_t p2[]);
+void mutate(creature_t *c);
 
 rgb_t target[TARGET_SIZE] = {
 	{255, 232, 210}
@@ -146,8 +148,6 @@ int WinMain(int argc, char **argv) {
 			creature_t children[POPULATION];
 			create_children(population, pool, s, children);
 
-			// TODO: mutation
-
 			swap_population(population, children);
 
 		c++;
@@ -172,6 +172,7 @@ void calc_fitness(creature_t population[]) {
 				population[i].dna[j].g == target[j].g &&
 				population[i].dna[j].b == target[j].b) {
 				fitness++;
+				SDL_Log("MATCH!");
 			}
 		}
 		population[i].fitness = fitness;
@@ -187,6 +188,7 @@ size_t calc_mating_pool(creature_t population[], int pool[]) {
 			k++;
 		}
 	}
+	SDL_Log("k: %d", k);
 	return k;
 }
 
@@ -202,6 +204,7 @@ void create_children(creature_t population[], int pool[], size_t s, creature_t c
 		int p2 = rand() % s;
 
 		mate(population[pool[p1]], population[pool[p2]], &(children[i]));
+		mutate(&children[i]);
 		children[i].fitness = 1;
 	}
 }
@@ -227,6 +230,19 @@ void swap_population(creature_t p1[], creature_t p2[]) {
 		p1[i] = p2[i];
 	}
 }
+
+void mutate(creature_t *c) {
+	for(int i = 0; i < DNA_SIZE; i++) {
+		int m = rand() % 1001;
+		if(m < MUTATION_RATE) {
+			c->dna[i].r = rand() % 256;
+			c->dna[i].g = rand() % 256;
+			c->dna[i].b = rand() % 256;
+		}
+	}
+}
+
+
 
 
 
