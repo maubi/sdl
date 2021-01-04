@@ -48,3 +48,13 @@ text: text.o
 	$(CC) $(CFLAGS) text.o $(LDLIBS) -o text.exe
 
 text.o:
+
+fractals: fractals.o
+	$(CC) $(CFLAGS) fractals.o $(LDLIBS) -o fractals.exe
+
+fractals.o:
+
+
+
+
+
