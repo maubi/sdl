@@ -60,20 +60,17 @@ int WinMain(int argc, char **argv) {
 	while(c < SKETCH_1_CYCLES) {
 		SDL_Log("Cycle: %d", c);
 
-		while(SDL_PollEvent(&event)) {		// need to poll the event queue otherwise win becomes unresponsive
-		}
+		SDL_PumpEvents();
+		SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
 
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 		SDL_RenderClear(rend);
-
-		while(SDL_PollEvent(&event)) {	// need to poll for events otherwise win becomes unresponsive
-		}
 
 		draw_cantor(rend, 3, 0, 0, WINDOW_WIDTH - 1);	
 		SDL_RenderPresent(rend);
 
 		c++;
-		SDL_Delay(500);
+		SDL_Delay(1000);
 	}
 
 	// sketch2
@@ -83,19 +80,21 @@ int WinMain(int argc, char **argv) {
 
 		color_t color = {255, 255, 255};
 
-		while(SDL_PollEvent(&event)) {		// need to poll the event queue otherwise win becomes unresponsive
-		}
+		SDL_PumpEvents();
+		SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
 
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 		SDL_RenderClear(rend);
 
 		draw_circles(rend, WINDOW_WIDTH / 2 - 1, WINDOW_HEIGHT / 2 - 1, WINDOW_HEIGHT / 3 - 1, color);
+		SDL_RenderPresent(rend);
 		SDL_Delay(1000);
 
 		SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 		SDL_RenderClear(rend);
 
 		draw_squares(rend, WINDOW_WIDTH / 2 - 1 - 200 , WINDOW_HEIGHT / 2 - 1 - 200, 400, color);
+		SDL_RenderPresent(rend);
 		SDL_Delay(1000);
 
 		c++;
@@ -117,9 +116,6 @@ void draw_cantor(SDL_Renderer *rend, int n, int x, int y, int len) {
 
 	SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
 	SDL_RenderDrawLine(rend, x, y, x + len, y);
-	SDL_RenderPresent(rend);
-
-	SDL_Delay(500);
 
 	int left_x = x;
 	int left_y = y + 10;
@@ -138,7 +134,6 @@ void draw_circles(SDL_Renderer * rend, int x, int y, int radius, color_t color) 
 	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
 
 	draw_circle(rend, x, y, radius, color);
-	SDL_RenderPresent(rend);
 
 	color_t c;
 	if(radius > 8) {
@@ -184,12 +179,7 @@ void draw_circle(SDL_Renderer *rend, int x0, int y0, int radius, color_t color) 
 			x -= 1;
 			err -= 2 * x + 1;
 		}
-
-		SDL_PumpEvents();
-		SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
 	}
-
-	SDL_RenderPresent(rend);
 }
 
 void draw_squares(SDL_Renderer * rend, int x, int y, int len, color_t color) {
@@ -197,14 +187,18 @@ void draw_squares(SDL_Renderer * rend, int x, int y, int len, color_t color) {
 	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
 
 	// SDL_SetRenderDrawColor(rend, color.r, color.g, color.b, 255); 	//multi-color
-	SDL_SetRenderDrawColor(rend, 128, 0, 128, 255);	// monochrome
+	//SDL_SetRenderDrawColor(rend, 128, 0, 128, 255);	// monochrome
+	int r = rand() % 256;
+	int g = rand() % 256;
+	int b = rand() % 256;
+	SDL_SetRenderDrawColor(rend, r, g, b, 255);	// monochrome
 	SDL_Rect rect;
 	rect.x = x;
 	rect.y = y;
 	rect.w = len;
 	rect.h = len;
 	SDL_RenderDrawRect(rend, &rect);
-	SDL_RenderPresent(rend);
+	//SDL_RenderFillRect(rend, &rect);
 
 	color_t c;
 	if(len > 12) {
