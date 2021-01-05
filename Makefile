@@ -1,8 +1,9 @@
-CC=x86_64-w64-mingw32-gcc.exe
+CC=mingw32-gcc
 CFLAGS=-g -std=c99
 LDLIBS=-lSDL2 -lSDL2_image -lSDL2_ttf
+LDSTATIC=-Wl,-Bstatic -lSDL2 -lSDL2_image -lSDL2_ttf
 
-all: hello perpixel gravity rotation subpixel random genetic risk text
+all: hello perpixel gravity rotation subpixel random genetic risk text fractals menu
 
 hello: hello.o
 	$(CC) $(CFLAGS) hello.o $(LDLIBS) -o hello.exe
@@ -54,7 +55,7 @@ fractals: fractals.o
 
 fractals.o:
 
+menu: menu.o
+	$(CC) $(CFLAGS) menu.o $(LDLIBS) -o menu.exe
 
-
-
-
+menu.o:
