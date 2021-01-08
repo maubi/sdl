@@ -59,3 +59,8 @@ menu: menu.o
 	$(CC) $(CFLAGS) menu.o $(LDLIBS) -o menu.exe
 
 menu.o:
+
+game_000: game_000.o
+	$(CC) $(CFLAGS) game_000.o $(LDLIBS) -o game_000.exe
+
+game_000.o:
